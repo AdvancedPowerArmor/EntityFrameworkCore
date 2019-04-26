@@ -5,8 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace Microsoft.EntityFrameworkCore.Metadata.Internal
+namespace Microsoft.EntityFrameworkCore.Metadata
 {
     /// <summary>
     ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to
@@ -14,7 +15,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
     ///     any release. You should only use it directly in your code with extreme caution and knowing that
     ///     doing so can result in application failures when updating to a new Entity Framework Core release.
     /// </summary>
-    public abstract class ParameterBinding
+    public abstract class ConstructorBinding
     {
         /// <summary>
         ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to
@@ -22,12 +23,10 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         ///     any release. You should only use it directly in your code with extreme caution and knowing that
         ///     doing so can result in application failures when updating to a new Entity Framework Core release.
         /// </summary>
-        protected ParameterBinding(
-            [NotNull] Type parameterType,
-            [NotNull] params IPropertyBase[] consumedProperties)
+        protected ConstructorBinding(
+            [NotNull] IReadOnlyList<ParameterBinding> parameterBindings)
         {
-            ParameterType = parameterType;
-            ConsumedProperties = consumedProperties;
+            ParameterBindings = parameterBindings;
         }
 
         /// <summary>
@@ -36,7 +35,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         ///     any release. You should only use it directly in your code with extreme caution and knowing that
         ///     doing so can result in application failures when updating to a new Entity Framework Core release.
         /// </summary>
-        public virtual Type ParameterType { get; }
+        public abstract Expression CreateConstructorExpression(ParameterBindingInfo bindingInfo);
 
         /// <summary>
         ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to
@@ -44,7 +43,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         ///     any release. You should only use it directly in your code with extreme caution and knowing that
         ///     doing so can result in application failures when updating to a new Entity Framework Core release.
         /// </summary>
-        public virtual IReadOnlyList<IPropertyBase> ConsumedProperties { get; }
+        public virtual IReadOnlyList<ParameterBinding> ParameterBindings { get; }
 
         /// <summary>
         ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to
@@ -52,6 +51,6 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         ///     any release. You should only use it directly in your code with extreme caution and knowing that
         ///     doing so can result in application failures when updating to a new Entity Framework Core release.
         /// </summary>
-        public abstract Expression BindToParameter(ParameterBindingInfo bindingInfo);
+        public abstract Type RuntimeType { get; }
     }
 }
